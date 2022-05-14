@@ -1,16 +1,24 @@
 class Board
-  attr_accessor :board_state
+  attr_accessor :board_state, :game_won
 
   def initialize
     @board_state = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    @game_won = false
+    print_board
   end
 
-  def check_if_valid_input?(input)
-    (input.is_a? Integer) && board_state.flatten.include?(input)
+  def check_if_valid_input?(object)
+    (object.move.is_a? Integer) && board_state.flatten.include?(object.move)
   end
 
-  def update_board_state(input)
-    board_state[input.to_i - 1] = 'X'
+  def update_board_state(object)
+    board_state[object.move - 1] = object.symbol
+  end
+
+  def check_if_game_won
+    if board_state[0] == board_state[1] && board_state[1] == board_state[2]
+      @game_won = true
+    end
   end
 
   def print_board
@@ -28,7 +36,7 @@ class Board
 end
 
 class Game
-  def welcome
+  def initialize
     puts 'Welcome to Tic-Tac-Toe.'
     puts "This is a player vs. player game. Player One will have X's, Player Two will have O's."
   end
@@ -39,35 +47,46 @@ class Game
   end
 end
 
-# I'm not sure I want to initialize the player object each time...
-
 class Player1
-  attr_accessor :player_1_input
+  attr_accessor :move, :symbol
 
   def initialize
+    @symbol = 'X'
+  end
+  def input_move
     puts 'Player 1, please enter the number of the board-square you want to place your X.'
-    @player_1_input = gets.chomp.to_i
+    @move = gets.chomp.to_i
   end
 end
 
 class Player2
-  attr_accessor :player_2_input
+  attr_accessor :move, :symbol
 
   def initialize
+    @symbol = 'O'
+  end
+
+  def input_move
     puts 'Player 2, please enter the number of the board-square you want to place your O.'
-    @player_2_input = gets.chomp.to_i
+    @move = gets.chomp.to_i
   end
 end
 
 new_game = Game.new
-new_game.welcome
 new_board = Board.new
-new_board.print_board
-p1_move = Player1.new.player_1_input
-if new_board.check_if_valid_input?(p1_move)
-  new_board.update_board_state(p1_move)
-else 
+player_1 = Player1.new
+player_2 = Player2.new
 
+player_1.input_move
+if new_board.check_if_valid_input?(player_1)
+  new_board.update_board_state(player_1)
+  new_board.check_if_game_won
+end
+new_board.print_board
+player_2.input_move
+if new_board.check_if_valid_input?(player_2)
+  new_board.update_board_state(player_2)
+  new_board.check_if_game_won
 end
 
 p new_board.board_state
