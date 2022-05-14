@@ -74,21 +74,28 @@ end
 
 new_game = Game.new
 new_board = Board.new
-player_1 = Player1.new
-player_2 = Player2.new
+player1 = Player1.new
+player2 = Player2.new
 
-player_1.input_move
-if new_board.check_if_valid_input?(player_1)
-  new_board.update_board_state(player_1)
-  new_board.check_if_game_won
+until new_board.game_won
+  player1.input_move
+  if new_board.check_if_valid_input?(player1)
+    new_board.update_board_state(player1)
+    if new_board.check_if_game_won
+      new_board.print_board
+      puts "Player 1 wins!"
+      break
+    end
+  end
+  new_board.print_board
+  player2.input_move
+  if new_board.check_if_valid_input?(player2)
+    new_board.update_board_state(player2)
+    if new_board.check_if_game_won
+      new_board.print_board
+      puts "Player 2 wins!"
+      break
+    end
+  end
+  new_board.print_board
 end
-new_board.print_board
-player_2.input_move
-if new_board.check_if_valid_input?(player_2)
-  new_board.update_board_state(player_2)
-  new_board.check_if_game_won
-end
-
-p new_board.board_state
-
-new_board.print_board
