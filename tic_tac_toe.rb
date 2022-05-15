@@ -1,4 +1,8 @@
 # frozen_string_literal: true
+# consider how to playerswap and loop that (each maybe?)
+# my classes are way too blended together I need to figure out how to separate them in the methods more
+# I also need to get the play game functionality mostly embedded in my TicTacToe class rather than just floating outside.
+
 
 class TicTacToe
   attr_accessor :board_state, :keep_playing
@@ -7,17 +11,13 @@ class TicTacToe
     puts 'Welcome to Tic-Tac-Toe.'
     puts "This is a player vs. player game. Player One will have X's, Player Two will have O's."
   end
-  
+
   def initialize
     @board_state = [1, 2, 3, 4, 5, 6, 7, 8, 9]
     @keep_playing = true
   end
 
   def play_game
-  end
-
-  def check_if_valid_input?(object)
-    (object.move.is_a? Integer) && board_state.flatten.include?(object.move)
   end
 
   def update_board_state(object)
@@ -92,7 +92,6 @@ class Player
   end
 end
 
-# DRY i think I can make an array with both players and enumerate over each instead of what i did here
 
 new_game = TicTacToe.new
 new_game.welcome
