@@ -9,6 +9,16 @@ class TicTacToe
     @keep_playing = true
     @game_over = false
     @player_list = []
+    @WINNING_COMBINATIONS = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6],
+    ]
   end
 
   # gamerunner, sets up 2 permanent players then plays a round. Keeping symbols fixed due to board-state check logic
@@ -23,7 +33,9 @@ class TicTacToe
     end
   end
 
-  # nested loop to play a turn and run checks for each player. Need to understand why this can't be private rn
+  protected
+
+  # nested loop to play a turn and run checks for each player.
   def play_turns(player1, player2)
     @player_list.push(player1, player2)
     loop do
@@ -45,14 +57,19 @@ class TicTacToe
       end
       break if @game_over == true
     end
-    puts "#{player1.name} has won #{player1.wins} times, and #{player2.name} has won #{player2.wins} times."
+    puts "#{player1.name} has won #{player1.wins} times, and #{player2.name} has won #{player2.wins} times.\n\n"
   end
 
   private
 
   def welcome
-    puts 'Welcome to Tic-Tac-Toe.'
-    puts "This is a player vs. player game. Player 1 will have X's, Player 2 will have O's. Your goal is to connect 3 in a row. Good luck!"
+    puts '|+++++++++++++++++++++++++++++|'
+    puts '|++++++++ TIC-TAC-TOE ++++++++|'
+    puts '|+++++++++++++++++++++++++++++|'
+    puts ''
+    puts 'Welcome to Tic-Tac-Toe. The game of CHAMPS.'
+    puts ''
+    puts "This is a player vs. player game. Player 1 has X's, Player 2 has O's. Connect 3 in a row! Good luck!"
   end
 
   def update_board_state(player_object)
@@ -60,23 +77,17 @@ class TicTacToe
   end
 
   def game_won
-    if board_state[0] == board_state[1] && board_state[1] == board_state[2]
-      @game_over = true
-    elsif board_state[3] == board_state[4] && board_state[4] == board_state[5]
-      @game_over = true
-    elsif board_state[6] == board_state[7] && board_state[7] == board_state[8]
-      @game_over = true
-    elsif board_state[0] == board_state[3] && board_state[3] == board_state[6]
-      @game_over = true
-    elsif board_state[1] == board_state[4] && board_state[4] == board_state[7]
-      @game_over = true
-    elsif board_state[2] == board_state[5] && board_state[5] == board_state[8]
-      @game_over = true
-    elsif board_state[0] == board_state[4] && board_state[4] == board_state[8]
-      @game_over = true
-    elsif board_state[2] == board_state[4] && board_state[4] == board_state[6]
-      @game_over = true
+    @WINNING_COMBINATIONS.each do |combination|
+      test_array = []
+      combination.each do |number|
+        test_array.push(board_state[number])
+      end
+      if test_array == ['X', 'X', 'X'] || test_array == ['O', 'O', 'O']
+        @game_over = true
+        return true
+      end
     end
+    false
   end
 
   def game_drawn
@@ -107,31 +118,31 @@ class TicTacToe
   end
 end
 
-# Player class has two instances made (currently the symbol is fixed for readability.)
+# Player class has two instances made (currently the symbol is fixed for readability and draw status check.)
 class Player
   attr_reader :symbol, :name
   attr_accessor :move, :wins
 
-  @@player_number = 1
+  @@player_number = 0
 
   def initialize(symbol)
     @symbol = symbol
     @wins = 0
     @move = ''
+    @@player_number += 1
     puts "Player #{@@player_number}, what is your name?"
     @name = gets.chomp
-    @@player_number += 1
   end
 
   def input_move(tic_tac_toe_object)
-    puts "#{name}, please enter the number of the board-square you want to place your #{symbol}."
+    puts "#{name}, please enter the number of the board-square where you want to place your #{symbol}."
     loop do
       input = gets.chomp.to_i
       if (input.is_a? Integer) && tic_tac_toe_object.board_state.flatten.include?(input)
         self.move = input
         break
       end
-      puts "Invalid input. Please enter the number of the board-square you want to place your #{symbol}."
+      puts "Invalid input. Please enter the number of the board-square where you want to place your #{symbol}."
     end
   end
 end
