@@ -9,7 +9,7 @@ class TicTacToe
     @keep_playing = true
     @game_over = false
     @player_list = []
-    @WINNING_COMBINATIONS = [
+    @winning_combinations = [
       [0, 1, 2],
       [3, 4, 5],
       [6, 7, 8],
@@ -17,7 +17,7 @@ class TicTacToe
       [1, 4, 7],
       [2, 5, 8],
       [0, 4, 8],
-      [2, 4, 6],
+      [2, 4, 6]
     ]
   end
 
@@ -77,7 +77,7 @@ class TicTacToe
   end
 
   def game_won
-    @WINNING_COMBINATIONS.each do |combination|
+    @winning_combinations.each do |combination|
       test_array = []
       combination.each do |number|
         test_array.push(board_state[number])
