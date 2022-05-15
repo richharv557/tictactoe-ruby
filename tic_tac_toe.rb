@@ -1,9 +1,10 @@
 class Board
-  attr_accessor :board_state, :game_won
+  attr_accessor :board_state, :game_won, :game_drawn
 
   def initialize
     @board_state = [1, 2, 3, 4, 5, 6, 7, 8, 9]
     @game_won = false
+    @game_drawn = false
     print_board
   end
 
@@ -18,9 +19,29 @@ class Board
   def check_if_game_won
     if board_state[0] == board_state[1] && board_state[1] == board_state[2]
       @game_won = true
+    elsif board_state[3] == board_state[4] && board_state[4] == board_state[5]
+      @game_won = true
+    elsif board_state[6] == board_state[7] && board_state[7] == board_state[8]
+      @game_won = true
+    elsif board_state[0] == board_state[3] && board_state[3] == board_state[6]
+      @game_won = true
+    elsif board_state[1] == board_state[4] && board_state[4] == board_state[7]
+      @game_won = true
+    elsif board_state[2] == board_state[5] && board_state[5] == board_state[8]
+      @game_won = true
+    elsif board_state[0] == board_state[4] && board_state[4] == board_state[8]
+      @game_won = true
+    elsif board_state[2] == board_state[4] && board_state[4] == board_state[6]
+      @game_won = true
     end
   end
 
+  def check_if_game_drawn
+    if board_state.all? { |i| i.is_a? String }
+      @game_drawn = true
+    end
+  end
+  
   def print_board
     puts("        
             |   |   
@@ -36,7 +57,10 @@ class Board
 end
 
 class Game
+  attr_accessor :keep_playing
+  
   def initialize
+    @keep_playing = true
     puts 'Welcome to Tic-Tac-Toe.'
     puts "This is a player vs. player game. Player One will have X's, Player Two will have O's."
   end
@@ -48,7 +72,7 @@ class Game
 end
 
 class Player1
-  attr_accessor :move, :symbol
+  attr_reader :move, :symbol
 
   def initialize
     @symbol = 'X'
@@ -60,7 +84,7 @@ class Player1
 end
 
 class Player2
-  attr_accessor :move, :symbol
+  attr_reader :move, :symbol
 
   def initialize
     @symbol = 'O'
@@ -72,30 +96,45 @@ class Player2
   end
 end
 
-new_game = Game.new
-new_board = Board.new
-player1 = Player1.new
-player2 = Player2.new
+# still need to validate player input and reloop if invalid
+# DRY i think I can make an array with both players and enumerate over each instead of what i did here
 
-until new_board.game_won
-  player1.input_move
-  if new_board.check_if_valid_input?(player1)
-    new_board.update_board_state(player1)
-    if new_board.check_if_game_won
-      new_board.print_board
-      puts "Player 1 wins!"
-      break
+new_game = Game.new
+while new_game.keep_playing do
+  new_board = Board.new
+  player1 = Player1.new
+  player2 = Player2.new
+  loop do
+    player1.input_move
+    if new_board.check_if_valid_input?(player1)
+      new_board.update_board_state(player1)
+      if new_board.check_if_game_won
+        new_board.print_board
+        puts "Player 1 wins!"
+        break
+      end
+      if new_board.check_if_game_drawn
+        new_board.print_board
+        puts 'Game drawn, nobody wins!'
+        break
+      end
     end
-  end
-  new_board.print_board
-  player2.input_move
-  if new_board.check_if_valid_input?(player2)
-    new_board.update_board_state(player2)
-    if new_board.check_if_game_won
-      new_board.print_board
-      puts "Player 2 wins!"
-      break
+    new_board.print_board
+    player2.input_move
+    if new_board.check_if_valid_input?(player2)
+      new_board.update_board_state(player2)
+      if new_board.check_if_game_won
+        new_board.print_board
+        puts 'Player 2 wins!'
+        break
+      end
+      if new_board.check_if_game_drawn
+        new_board.print_board
+        puts 'Game drawn, nobody wins!'
+        break
+      end
     end
+    new_board.print_board
   end
-  new_board.print_board
+  new_game.ask_for_new_round? ? new_game.keep_playing = true : new_game.keep_playing = false
 end
