@@ -1,11 +1,19 @@
-class Board
-  attr_accessor :board_state, :game_won, :game_drawn
+# frozen_string_literal: true
 
+class TicTacToe
+  attr_accessor :board_state, :keep_playing
+
+  def welcome
+    puts 'Welcome to Tic-Tac-Toe.'
+    puts "This is a player vs. player game. Player One will have X's, Player Two will have O's."
+  end
+  
   def initialize
     @board_state = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-    @game_won = false
-    @game_drawn = false
-    print_board
+    @keep_playing = true
+  end
+
+  def play_game
   end
 
   def check_if_valid_input?(object)
@@ -41,7 +49,7 @@ class Board
       @game_drawn = true
     end
   end
-  
+
   def print_board
     puts("        
             |   |   
@@ -54,16 +62,6 @@ class Board
           #{board_state[6]} | #{board_state[7]} | #{board_state[8]} 
             |   |   ")
   end
-end
-
-class Game
-  attr_accessor :keep_playing
-  
-  def initialize
-    @keep_playing = true
-    puts 'Welcome to Tic-Tac-Toe.'
-    puts "This is a player vs. player game. Player One will have X's, Player Two will have O's."
-  end
 
   def ask_for_new_round?
     puts 'Would you like to play again? Type y for yes, anything else for no.'
@@ -71,70 +69,64 @@ class Game
   end
 end
 
-class Player1
-  attr_reader :move, :symbol
+class Player
+  attr_reader :symbol, :name
+  attr_accessor :move
 
-  def initialize
-    @symbol = 'X'
-  end
-  def input_move
-    puts 'Player 1, please enter the number of the board-square you want to place your X.'
-    @move = gets.chomp.to_i
-  end
-end
-
-class Player2
-  attr_reader :move, :symbol
-
-  def initialize
-    @symbol = 'O'
+  def initialize(name, symbol)
+    @symbol = symbol
+    @name = name
+    @move = ''
   end
 
-  def input_move
-    puts 'Player 2, please enter the number of the board-square you want to place your O.'
-    @move = gets.chomp.to_i
+  def input_move(object)
+    puts "#{name}, please enter the number of the board-square you want to place your #{symbol}."
+    loop do
+      input = gets.chomp.to_i
+      if (input.is_a? Integer) && object.board_state.flatten.include?(input)
+        self.move = input
+        break
+      end
+      puts "Invalid input. Please enter the number of the board-square you want to place your #{symbol}."
+    end
   end
 end
 
-# still need to validate player input and reloop if invalid
 # DRY i think I can make an array with both players and enumerate over each instead of what i did here
 
-new_game = Game.new
+new_game = TicTacToe.new
+new_game.welcome
 while new_game.keep_playing do
-  new_board = Board.new
-  player1 = Player1.new
-  player2 = Player2.new
+  new_game = TicTacToe.new
+  player1 = Player.new('Player 1', 'X')
+  player2 = Player.new('Player 2', 'O')
   loop do
-    player1.input_move
-    if new_board.check_if_valid_input?(player1)
-      new_board.update_board_state(player1)
-      if new_board.check_if_game_won
-        new_board.print_board
-        puts "Player 1 wins!"
-        break
-      end
-      if new_board.check_if_game_drawn
-        new_board.print_board
-        puts 'Game drawn, nobody wins!'
-        break
-      end
+    new_game.print_board
+    player1.input_move(new_game)
+    new_game.update_board_state(player1)
+    if new_game.check_if_game_won
+      new_game.print_board
+      puts "Player 1 wins!"
+      break
     end
-    new_board.print_board
-    player2.input_move
-    if new_board.check_if_valid_input?(player2)
-      new_board.update_board_state(player2)
-      if new_board.check_if_game_won
-        new_board.print_board
-        puts 'Player 2 wins!'
-        break
-      end
-      if new_board.check_if_game_drawn
-        new_board.print_board
-        puts 'Game drawn, nobody wins!'
-        break
-      end
+    if new_game.check_if_game_drawn
+      new_game.print_board
+      puts 'Game drawn, nobody wins!'
+      break
     end
-    new_board.print_board
+    new_game.print_board
+    player2.input_move(new_game)
+    new_game.update_board_state(player2)
+    if new_game.check_if_game_won
+      new_game.print_board
+      puts 'Player 2 wins!'
+      break
+    end
+    if new_game.check_if_game_drawn
+      new_game.print_board
+      puts 'Game drawn, nobody wins!'
+      break
+    end
   end
   new_game.ask_for_new_round? ? new_game.keep_playing = true : new_game.keep_playing = false
 end
